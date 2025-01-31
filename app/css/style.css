@@ -1,0 +1,8 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+#sensorData {
+    white-space: pre-wrap;
+    font-family: monospace;
+}

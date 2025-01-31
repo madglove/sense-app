@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Madglove Sense</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="app/css/style.css">
+</head>
+<body class="container mt-5">
+    <h1>Madglove Sense</h1>
+
+    <!-- Form to Collect Secrets from the User -->
+    <div class="mt-5">
+        <h3>Enter Credentials to Connect</h3>
+        <form id="authForm">
+            <div class="mb-3">
+                <label for="host" class="form-label">Host</label>
+                <input type="text" id="host" class="form-control" placeholder="api.customer.extrahorizon.io" required>
+            </div>
+            <div class="mb-3">
+                <label for="consumerKey" class="form-label">OAuth Consumer Key</label>
+                <input type="text" id="consumerKey" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="consumerSecret" class="form-label">OAuth Consumer Secret</label>
+                <input type="password" id="consumerSecret" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Connect</button>
+        </form>
+
+        <p id="connectionStatus" class="mt-3 text-info">Waiting for user input...</p>
+    </div>
+
+    <div class="container mt-5">
+        <h2>BLE Sensor Data</h2>
+        <p id="status" class="alert alert-info">Disconnected</p>
+        <button id="connect" class="btn btn-primary">Connect to BLE Device</button>
+        <button id="start" class="btn btn-success" disabled>Start Streaming</button>
+        <button id="stop" class="btn btn-danger" disabled>Stop Streaming</button>
+
+        <br>
+        <div class="mt-3">
+            <button id="startRecording" class="btn btn-warning">Start Recording</button>
+            <button id="stopRecording" class="btn btn-secondary" disabled>Stop Recording</button>
+            <button id="downloadCSV" class="btn btn-info" disabled>Download CSV</button>
+        </div>    
+    
+        <h3 class="mt-4">Real-Time Sensor Data</h3>
+        <div id="data" class="border p-3 bg-light">No data received yet.</div>
+    
+    </div>
+
+    <br>
+
+    <h2 class="text-center mb-4">Madglove Sense - IMU Data Visualization</h2>
+    <div class="row">
+        <!-- IMU1 -->
+        <div class="col-md-6">
+            <h3 class="text-center">Wirst - IMU1 Accelerometer</h3>
+            <canvas id="imu1AccelChart"></canvas>
+            <h3 class="text-center mt-4">Wirst - IMU1 Gyroscope</h3>
+            <canvas id="imu1GyroChart"></canvas>
+        </div>
+
+        <!-- IMU2 -->
+        <div class="col-md-6">
+            <h3 class="text-center">Finger - IMU2 Accelerometer</h3>
+            <canvas id="imu2AccelChart"></canvas>
+            <h3 class="text-center mt-4">Finger - IMU2 Gyroscope</h3>
+            <canvas id="imu2GyroChart"></canvas>
+        </div>
+    </div>
+
+    <br>
+    <div>
+        <h3 class="mt-4">Raw BLE Data</h3>
+        <pre id="debug" class="border p-3 bg-light">Debug log will appear here.</pre>
+    </div>
+
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    
+    <script src="app/js/script.js"></script>
+    <script src="app/js/charts.js"></script>
+    <script src="app/js/recording.js"></script>
+    <script src="app/js/backend.js"></script>
+
+
+</body>
+</html>
