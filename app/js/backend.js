@@ -6,19 +6,18 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();  // Prevent form from submitting the traditional way
 
         // Get values from form inputs
-        const host = document.querySelector('#host').value;
         const consumerKey = document.querySelector('#consumerKey').value;
         const consumerSecret = document.querySelector('#consumerSecret').value;
         const email = document.querySelector('#email').value;
         const password = document.querySelector('#password').value;
 
-        // Construct the full base URL
-        const baseUrl = `https://${host}`;
+        // Fixed API URL
+        const apiUrl = "https://api.dev.madglove.extrahorizon.io/auth/v2/oauth1/tokens";
 
         connectionStatus.textContent = 'Connecting to Extra Horizon...';
 
         try {
-            const { token, tokenSecret } = await authenticate(baseUrl, consumerKey, consumerSecret, email, password);
+            const { token, tokenSecret } = await authenticate(apiUrl, consumerKey, consumerSecret, email, password);
             
             connectionStatus.textContent = 'Connected successfully!';
             connectionStatus.classList.remove('text-danger');
@@ -36,8 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    async function authenticate(baseUrl, consumerKey, consumerSecret, email, password) {
-        const response = await fetch(`${baseUrl}/auth/v2/oauth1/tokens`, {
+    async function authenticate(apiUrl, consumerKey, consumerSecret, email, password) {
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
