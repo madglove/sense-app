@@ -2,14 +2,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const authForm = document.querySelector('#authForm');
     const connectionStatus = document.querySelector('#connectionStatus');
 
+    // 🔥 Fix: Ensure elements exist before accessing them
+    if (!authForm || !connectionStatus) {
+        console.error("❌ Form or status element not found! Make sure your HTML is loaded.");
+        return;
+    }
+
     authForm.addEventListener('submit', async (event) => {
         event.preventDefault();  // Prevent form from submitting the traditional way
 
         // Get values from form inputs
-        const consumerKey = document.querySelector('#consumerKey').value;
-        const consumerSecret = document.querySelector('#consumerSecret').value;
-        const email = document.querySelector('#email').value;
-        const password = document.querySelector('#password').value;
+        const consumerKeyInput = document.querySelector('#consumerKey');
+        const consumerSecretInput = document.querySelector('#consumerSecret');
+        const emailInput = document.querySelector('#email');
+        const passwordInput = document.querySelector('#password');
+
+        // 🔥 Fix: Ensure inputs exist before accessing their values
+        if (!consumerKeyInput || !consumerSecretInput || !emailInput || !passwordInput) {
+            console.error("❌ One or more input fields are missing in the HTML.");
+            return;
+        }
+
+        const consumerKey = consumerKeyInput.value;
+        const consumerSecret = consumerSecretInput.value;
+        const email = emailInput.value;
+        const password = passwordInput.value;
 
         // Fixed API URL
         const apiUrl = "https://api.dev.madglove.extrahorizon.io/auth/v2/oauth1/tokens";
@@ -28,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`Connected successfully!\nToken: ${token}\nSecret: ${tokenSecret}`);
 
         } catch (error) {
-            console.error('Connection failed:', error);
+            console.error('❌ Connection failed:', error);
             connectionStatus.textContent = 'Connection failed. Check console for details.';
             connectionStatus.classList.remove('text-success');
             connectionStatus.classList.add('text-danger');
