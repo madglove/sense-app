@@ -62,13 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('🔒 Token Secret:', tokenSecret);
       alert(`Connected successfully!\nToken: ${token}\nSecret: ${tokenSecret}`);
 
-      // Store token globally so other JS files can access it
+      // Make token available globally
       window.currentToken = token;
       window.currentTokenSecret = tokenSecret;
 
       // Update the status bar
       window.updateBackendStatus('Logged in to backend');
-
 
     } catch (error) {
       console.error('❌ Connection failed:', error);
