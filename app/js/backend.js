@@ -1,36 +1,48 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const authForm = document.querySelector('#authForm');
-    const connectionStatus = document.querySelector('#connectionStatus');
+    const authContainer = document.querySelector('#authContainer');
 
-    // 🔥 Fix: Ensure elements exist before accessing them
-    if (!authForm || !connectionStatus) {
-        console.error("❌ Form or status element not found! Make sure your HTML is loaded.");
+    if (!authContainer) {
+        console.error("❌ Auth container not found in the HTML.");
         return;
     }
 
+    // Dynamically generate the form and insert it into the DOM
+    authContainer.innerHTML = `
+        <h3>Enter Credentials to Connect</h3>
+        <form id="authForm">
+            <div class="mb-3">
+                <label for="consumerKey" class="form-label">OAuth Consumer Key</label>
+                <input type="text" id="consumerKey" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="consumerSecret" class="form-label">OAuth Consumer Secret</label>
+                <input type="password" id="consumerSecret" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Connect</button>
+        </form>
+        <p id="connectionStatus" class="mt-3 text-info">Waiting for user input...</p>
+    `;
+
+    const authForm = document.querySelector('#authForm');
+    const connectionStatus = document.querySelector('#connectionStatus');
+
     authForm.addEventListener('submit', async (event) => {
-        event.preventDefault();  // Prevent form from submitting the traditional way
+        event.preventDefault();
 
-        // Get values from form inputs
-        const consumerKeyInput = document.querySelector('#consumerKey');
-        const consumerSecretInput = document.querySelector('#consumerSecret');
-        const emailInput = document.querySelector('#email');
-        const passwordInput = document.querySelector('#password');
+        const consumerKey = document.querySelector('#consumerKey').value;
+        const consumerSecret = document.querySelector('#consumerSecret').value;
+        const email = document.querySelector('#email').value;
+        const password = document.querySelector('#password').value;
 
-        // 🔥 Fix: Ensure inputs exist before accessing their values
-        if (!consumerKeyInput || !consumerSecretInput || !emailInput || !passwordInput) {
-            console.error("❌ One or more input fields are missing in the HTML.");
-            return;
-        }
-
-        const consumerKey = consumerKeyInput.value;
-        const consumerSecret = consumerSecretInput.value;
-        const email = emailInput.value;
-        const password = passwordInput.value;
-
-        // Fixed API URL
         const apiUrl = "https://api.dev.madglove.extrahorizon.io/auth/v2/oauth1/tokens";
-
         connectionStatus.textContent = 'Connecting to Extra Horizon...';
 
         try {
@@ -66,13 +78,13 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         });
 
-        const responseText = await response.text(); // Read response as text for debugging
+        const responseText = await response.text();
 
         if (!response.ok) {
             throw new Error(`Authentication failed: ${response.status} - ${responseText}`);
         }
 
-        const data = JSON.parse(responseText); // Parse JSON if response is valid
+        const data = JSON.parse(responseText);
         return { token: data.token, tokenSecret: data.tokenSecret };
     }
 });

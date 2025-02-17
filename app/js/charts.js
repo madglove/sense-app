@@ -1,28 +1,39 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
+    const chartsContainer = document.querySelector('#chartsContainer');
+
+    if (!chartsContainer) {
+        console.error("❌ Charts container not found in the HTML.");
+        return;
+    }
+
+    // Inject chart elements dynamically into the DOM
+    chartsContainer.innerHTML = `
+        <div class="col-md-6">
+            <h3 class="text-center">Wrist - IMU1 Accelerometer</h3>
+            <canvas id="imu1AccelChart"></canvas>
+            <h3 class="text-center mt-4">Wrist - IMU1 Gyroscope</h3>
+            <canvas id="imu1GyroChart"></canvas>
+        </div>
+
+        <div class="col-md-6">
+            <h3 class="text-center">Finger - IMU2 Accelerometer</h3>
+            <canvas id="imu2AccelChart"></canvas>
+            <h3 class="text-center mt-4">Finger - IMU2 Gyroscope</h3>
+            <canvas id="imu2GyroChart"></canvas>
+        </div>
+    `;
+
     // Function to create a horizontal bar chart
     const createBarChart = (ctx, label, yLabel) => {
         return new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Accel X', 'Accel Y', 'Accel Z'], // Bar labels
-                datasets: [
-                    {
-                        label: label,
-                        data: [0, 0, 0], // Initial data
-                        backgroundColor: ['#ff6384', '#36a2eb', '#4caf50'], // Colors for bars
-                    }
-                ]
+                labels: ['Accel X', 'Accel Y', 'Accel Z'],
+                datasets: [{ label, data: [0, 0, 0], backgroundColor: ['#ff6384', '#36a2eb', '#4caf50'] }]
             },
             options: {
-                indexAxis: 'y', // Horizontal bars
-                scales: {
-                    x: {
-                        suggestedMin: -1.1,
-                        suggestedMax: 1.1,
-                        title: { display: true, text: yLabel }
-                    }
-                },
+                indexAxis: 'y',
+                scales: { x: { suggestedMin: -1.1, suggestedMax: 1.1, title: { display: true, text: yLabel } } },
                 responsive: true,
                 animation: { duration: 300 },
                 plugins: { legend: { display: false } }
@@ -35,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [], // Time labels
+                labels: [],
                 datasets: [
                     { label: `${label} X`, data: [], borderColor: 'red', fill: false, tension: 0.4 },
                     { label: `${label} Y`, data: [], borderColor: 'green', fill: false, tension: 0.4 },
@@ -43,14 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ]
             },
             options: {
-                scales: {
-                    x: { title: { display: true, text: 'Time (ms)' } },
-                    y: {
-                        suggestedMin: -100,
-                        suggestedMax: 100,
-                        title: { display: true, text: yLabel }
-                    }
-                },
+                scales: { x: { title: { display: true, text: 'Time (ms)' } }, y: { suggestedMin: -100, suggestedMax: 100, title: { display: true, text: yLabel } } },
                 responsive: true,
                 animation: { duration: 500, easing: 'easeOutQuad' },
                 plugins: { legend: { display: true } }
