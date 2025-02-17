@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const goLoginBtn = document.getElementById('goLoginBtn');
       goLoginBtn.addEventListener('click', () => {
         // Switch view to the Login tab
-        showView('loginView');
+        window.showView('loginView'); 
       });
       return;
     }
