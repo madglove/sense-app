@@ -33,6 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
         characteristic = await service.getCharacteristic('beb5483e-36e1-4688-b7f5-ea07361b26a8');
   
         statusElem.textContent = 'Connected! Ready to receive data';
+        
+        // Update global status bar for Bluetooth
+        window.updateBluetoothStatus('BLE Connected');
   
         startBtn.disabled = false;
         stopBtn.disabled = false;
@@ -152,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function onDisconnected() {
       statusElem.textContent = 'Device disconnected. Resetting...';
       resetConnection();
+      window.updateBluetoothStatus('BLE Disconnected');
     }
   });
   

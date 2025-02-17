@@ -61,11 +61,16 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('🔑 Token:', token);
         console.log('🔒 Token Secret:', tokenSecret);
         alert(`Connected successfully!\nToken: ${token}\nSecret: ${tokenSecret}`);
+        
+        // Update global status
+        window.updateBackendStatus('Logged in to backend');
       } catch (error) {
         console.error('❌ Connection failed:', error);
         connectionStatus.textContent = 'Connection failed. Check console for details.';
         connectionStatus.classList.remove('text-success');
         connectionStatus.classList.add('text-danger');
+        // Update global status
+        window.updateBackendStatus('Failed to login');
       }
     });
   
