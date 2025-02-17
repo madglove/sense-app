@@ -62,8 +62,14 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('🔒 Token Secret:', tokenSecret);
       alert(`Connected successfully!\nToken: ${token}\nSecret: ${tokenSecret}`);
 
-      // Update global status bar to reflect backend login
+      // Store token globally so other JS files can access it
+      window.currentToken = token;
+      window.currentTokenSecret = tokenSecret;
+
+      // Update the status bar
       window.updateBackendStatus('Logged in to backend');
+
+
     } catch (error) {
       console.error('❌ Connection failed:', error);
       connectionStatus.textContent = 'Connection failed. Check console for details.';
