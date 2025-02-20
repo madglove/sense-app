@@ -29,12 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (viewId === 'sessionView') btnShowSession.classList.add('active');
       if (viewId === 'cameraView') btnShowCamera.classList.add('active');
 
-      if (viewId === 'cameraView') {
-          startCamera();
-      } else {
-          stopHandTracking();
-          stopCamera();
-      }
   };
 
   btnShowLogin.addEventListener('click', () => window.showView('loginView'));

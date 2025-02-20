@@ -1,135 +1,109 @@
 // app/js/cameraManager.js
+(function() {
+  let currentStream = null;
+  let uiInitialized = false;
 
-// Global variables for camera management
-let cameraVideoElement = null;
-let cameraStream = null;
-let currentCameraId = null;
-let videoDevices = [];
+  // Create the camera UI inside the #cameraView div
+  function createCameraUI() {
+    const cameraView = document.getElementById('cameraView');
+    console.log('[CameraManager] Creating camera UI...');
+    cameraView.innerHTML = '';
+    cameraView.style.display = 'block';
 
-document.addEventListener('DOMContentLoaded', async () => {
-  // Assume the cameraView div is already in the DOM.
-  cameraVideoElement = document.getElementById('cameraVideo');
-  const cameraSelect = document.getElementById('cameraSelect');
+    // Create the Start Streaming button
+    const startBtn = document.createElement('button');
+    startBtn.id = 'startBtn';
+    startBtn.textContent = 'Start Streaming';
+    startBtn.className = 'btn btn-success me-2';
 
-  // Populate the camera dropdown
-  videoDevices = await getVideoDevices();
-  cameraSelect.innerHTML = '';
-  videoDevices.forEach((device, index) => {
-    const option = document.createElement('option');
-    option.value = device.deviceId;
-    option.text = device.label || `Camera ${index + 1}`;
-    cameraSelect.appendChild(option);
-  });
-  // Set currentCameraId to the first available device if any.
-  if (videoDevices.length > 0) {
-    currentCameraId = videoDevices[0].deviceId;
-    cameraSelect.value = currentCameraId;
+    // Create the Stop Streaming button
+    const stopBtn = document.createElement('button');
+    stopBtn.id = 'stopBtn';
+    stopBtn.textContent = 'Stop Streaming';
+    stopBtn.className = 'btn btn-danger';
+
+    // Create the video element to display the camera feed
+    const videoElem = document.createElement('video');
+    videoElem.id = 'cameraVideo';
+    videoElem.width = 640;
+    videoElem.height = 480;
+    videoElem.autoplay = true;
+    videoElem.playsInline = true;
+    videoElem.style.backgroundColor = '#000';
+    videoElem.className = 'mt-3';
+
+    // Append the elements to the camera view
+    cameraView.appendChild(startBtn);
+    cameraView.appendChild(stopBtn);
+    cameraView.appendChild(videoElem);
+
+    // Attach event listeners
+    startBtn.addEventListener('click', startStream);
+    stopBtn.addEventListener('click', stopStream);
+
+    uiInitialized = true;
+    console.log('[CameraManager] UI created successfully.');
   }
 
-  // Attach event listeners to buttons
-  document.getElementById('btnStartStreaming').addEventListener('click', () => {
-    currentCameraId = cameraSelect.value;
-    startCamera(currentCameraId);
-  });
-  document.getElementById('btnStopStreaming').addEventListener('click', stopCamera);
-  document.getElementById('btnSwitchCamera').addEventListener('click', switchCamera);
-  document.getElementById('btnToggleHandTracking').addEventListener('click', () => {
-    if (window.toggleHandTracking) {
-      window.toggleHandTracking();
-    } else {
-      console.error('toggleHandTracking is not available');
-    }
-  });
-});
+  // Start streaming using the default camera
+  async function startStream() {
+    console.log('[CameraManager] Start streaming requested.');
+    stopStream(); // Stop any existing stream
 
-// Retrieve available video input devices
-async function getVideoDevices() {
-  const devices = await navigator.mediaDevices.enumerateDevices();
-  return devices.filter(device => device.kind === 'videoinput');
-}
-
-// Start streaming from the specified (or default) camera
-async function startCamera(deviceId = null) {
-  if (!cameraVideoElement) {
-    cameraVideoElement = document.getElementById('cameraVideo');
-    if (!cameraVideoElement) {
-      console.error('Camera video element not found');
-      return;
+    const videoElem = document.getElementById('cameraVideo');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      currentStream = stream;
+      videoElem.srcObject = stream;
+      console.log('[CameraManager] Streaming started.');
+    } catch (err) {
+      console.error('[CameraManager] Error accessing camera:', err);
+      alert('Error accessing camera: ' + err.message);
     }
   }
-  if (!deviceId) {
-    if (currentCameraId) {
-      deviceId = currentCameraId;
-    } else {
-      const devices = await getVideoDevices();
-      if (devices.length > 0) {
-        deviceId = devices[0].deviceId;
-      } else {
-        console.error('No video devices found');
-        return;
+
+  // Stop the current camera stream
+  function stopStream() {
+    console.log('[CameraManager] Stop streaming requested.');
+    if (currentStream) {
+      currentStream.getTracks().forEach(track => {
+        track.stop();
+        console.log('[CameraManager] Stopped track:', track);
+      });
+      currentStream = null;
+      const videoElem = document.getElementById('cameraVideo');
+      if (videoElem) {
+        videoElem.srcObject = null;
+        console.log('[CameraManager] Cleared video element source.');
       }
+    } else {
+      console.log('[CameraManager] No active stream to stop.');
     }
   }
-  currentCameraId = deviceId;
 
-  // Stop any existing stream
-  if (cameraStream) {
-    stopCamera();
-  }
-
-  try {
-    const constraints = { video: { deviceId: { exact: deviceId } }, audio: false };
-    cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
-    cameraVideoElement.srcObject = cameraStream;
-    cameraVideoElement.style.display = 'block';
-    await cameraVideoElement.play();
-    console.log('Camera started with device:', deviceId);
-  } catch (error) {
-    console.error('Error accessing the camera:', error);
-    const errorMessageElement = document.getElementById('cameraErrorMessage');
-    if (errorMessageElement) {
-      errorMessageElement.textContent = 'Error accessing the camera: ' + error.message;
-      errorMessageElement.style.display = 'block';
-    }
-  }
-}
-
-// Stop the current video stream
-function stopCamera() {
-  if (cameraStream) {
-    cameraStream.getTracks().forEach(track => track.stop());
-    cameraStream = null;
-  }
-  if (cameraVideoElement) {
-    cameraVideoElement.srcObject = null;
-    cameraVideoElement.style.display = 'none';
-  }
-  // Also stop hand tracking if running
-  if (window.stopHandTracking) {
-    window.stopHandTracking();
-  }
-  console.log('Camera stopped');
-}
-
-// Switch to the next available camera
-async function switchCamera() {
-  const devices = await getVideoDevices();
-  if (devices.length <= 1) {
-    console.warn('No alternative cameras found');
-    return;
-  }
-  let currentIndex = devices.findIndex(device => device.deviceId === currentCameraId);
-  let nextIndex = (currentIndex + 1) % devices.length;
-  const nextDeviceId = devices[nextIndex].deviceId;
-  console.log('Switching camera to device:', nextDeviceId);
-  // Update the dropdown selection
-  const cameraSelect = document.getElementById('cameraSelect');
-  if (cameraSelect) {
-    cameraSelect.value = nextDeviceId;
-  }
-  await startCamera(nextDeviceId);
-}
-
-window.startCamera = startCamera;
-window.stopCamera = stopCamera;
-window.switchCamera = switchCamera;
+  // Use a MutationObserver to monitor #cameraView visibility changes
+  document.addEventListener('DOMContentLoaded', () => {
+    const cameraView = document.getElementById('cameraView');
+    console.log('[CameraManager] DOM content loaded. Setting up MutationObserver for cameraView...');
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        if (mutation.attributeName === 'style') {
+          const computedStyle = window.getComputedStyle(cameraView);
+          console.log('[CameraManager] Camera view style changed. Current display:', computedStyle.display);
+          if (computedStyle.display !== 'none') {
+            if (!uiInitialized) {
+              console.log('[CameraManager] Camera view is visible and UI not initialized. Creating UI...');
+              createCameraUI();
+            } else {
+              console.log('[CameraManager] Camera view is visible and UI already initialized.');
+            }
+          } else {
+            console.log('[CameraManager] Camera view is hidden. Stopping any active stream.');
+            stopStream();
+          }
+        }
+      });
+    });
+    observer.observe(cameraView, { attributes: true, attributeFilter: ['style'] });
+  });
+})();
