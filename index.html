@@ -12,12 +12,6 @@
   />
   <link rel="stylesheet" href="app/css/style.css" />
 
-  <!-- MediaPipe Hand Landmarker 
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs" type="module" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
--->
-
 </head>
 <body class="container mt-4">
   <!-- Logo + Title -->
@@ -44,7 +38,8 @@
       <button class="nav-link active" id="btnShowLogin">Login</button>
       <button class="nav-link" id="btnShowPatient">Patient</button>
       <button class="nav-link" id="btnShowSession">Session</button>
-      <button class="nav-link" id="btnShowCamera">Camera</button> 
+      <button class="nav-link" id="btnShowCamera">Camera</button>
+      <button class="nav-link" id="btnShowHandModel">Hand Model</button> 
     </nav>
   </div>
 
@@ -96,6 +91,8 @@
   <!-- VIEW: CAMERA -->
   <div id="cameraView" style="display: none;"></div>
 
+  <!-- VIEW: Hand Model -->
+  <div id="handModelView" style="display: none;"></div> <!-- New view -->
 
   <!-- Scripts -->
   <script
@@ -121,9 +118,12 @@
   <script src="app/js/patient.js"></script>
   <!-- Camera Manager -->
   <script src="app/js/cameraManager.js"></script>
+  
   <!-- Hand Tracking 
   <script src="app/js/handTracking.js" type="module"></script>
--->
+  -->
+
+  <script src="app/js/handModel.js" type="module" defer></script>
 
 </body>
 </html>
