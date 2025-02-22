@@ -4,6 +4,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 let scene, camera, renderer, controls, handModel, mixer, animationClip, animationAction; // Added animationAction
 
+// using this model https://sketchfab.com/3d-models/low-poly-hand-with-animation-33253439b0874d09b46a9a18685c863c
+
 function init() {
     // 1. Scene Setup
     scene = new THREE.Scene();
