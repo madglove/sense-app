@@ -12,6 +12,7 @@
   />
   <link rel="stylesheet" href="app/css/style.css" />
 
+
 </head>
 <body class="container mt-4">
   <!-- Logo + Title -->
@@ -92,7 +93,18 @@
   <div id="cameraView" style="display: none;"></div>
 
   <!-- VIEW: Hand Model -->
-  <div id="handModelView" style="display: none;"></div> <!-- New view -->
+  <div id="handModelView">
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.162.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.162.0/examples/jsm/"
+        }
+      }
+    </script>
+  </div>
+  <script type="module" src="/app/js/handModel.js"></script>
+  
 
   <!-- Scripts -->
   <script
@@ -119,11 +131,7 @@
   <!-- Camera Manager -->
   <script src="app/js/cameraManager.js"></script>
   
-  <!-- Hand Tracking 
-  <script src="app/js/handTracking.js" type="module"></script>
-  -->
 
-  <script src="app/js/handModel.js" type="module" defer></script>
 
 </body>
 </html>
