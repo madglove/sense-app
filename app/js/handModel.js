@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 let scene, camera, renderer, controls, handModel, mixer, animationClip, animationAction; // Added animationAction
 
-// using this model https://sketchfab.com/3d-models/low-poly-hand-with-animation-33253439b0874d09b46a9a18685c863c
+// using this model https://sketchfab.com/3d-models/low-poly_hand_with_animation.glb
 
 function init() {
     // 1. Scene Setup
@@ -12,12 +12,22 @@ function init() {
     scene.background = new THREE.Color(0xdddddd);
 
     // 2. Camera Setup
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth * 0.8 / window.innerHeight * 0.8, 0.1, 1000);
+    camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000); // Aspect ratio will be set later
 
     // 3. Renderer Setup
     renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth * 0.8, window.innerHeight * 0.8);
     const handModelContainer = document.getElementById('handModelView');
+
+    // Get the width and height of the container
+    const width = handModelContainer.offsetWidth;
+    const height = handModelContainer.offsetHeight;
+
+    console.log("handModelView div dimensions:", width, height); // *** DEBUG LOG 1: Container Dimensions ***
+
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+
     handModelContainer.appendChild(renderer.domElement);
 
     // 4. Lighting
@@ -37,6 +47,8 @@ function init() {
     loader.load('app/models/low-poly_hand_with_animation.glb', (gltf) => {
         handModel = gltf.scene;
         scene.add(handModel);
+
+        console.log("Model loaded successfully:", handModel); // *** DEBUG LOG 2: Model Load Success ***
 
         // --- Animation Setup (Corrected) ---
         if (gltf.animations && gltf.animations.length) {
@@ -84,10 +96,20 @@ function init() {
                 });
             }
         });
+
+        console.log("Camera Position:", camera.position); // *** DEBUG LOG 3: Camera Position ***
+        console.log("Camera LookAt Target:", controls.target); // *** DEBUG LOG 4: Camera Target ***
+        console.log("Hand Model Position:", handModel.position); // *** DEBUG LOG 5: Model Position ***
+        console.log("Hand Model Scale:", handModel.scale); // *** DEBUG LOG 6: Model Scale ***
+        console.log("Hand Model Rotation:", handModel.rotation); // *** DEBUG LOG 7: Model Rotation ***
+        console.log("Bounding Box Size:", size); // *** DEBUG LOG 8: Bounding Box Size ***
+        console.log("Bounding Box Center:", center); // *** DEBUG LOG 9: Bounding Box Center ***
+
+
     },
     undefined,
     (error) => {
-      console.error('An error happened while loading the model:', error);
+        console.error('An error happened while loading the model:', error); // Error log remains
     });
 
     // 6. Orbit Controls
@@ -165,40 +187,40 @@ function cleanup() {
         renderer = null;
     }
     if (scene) {
-      scene.traverse(object => {
-        if (!object.isMesh) return;
+        scene.traverse(object => {
+            if (!object.isMesh) return;
 
-        object.geometry.dispose();
+            object.geometry.dispose();
 
-        if (object.material.isMaterial) {
-          cleanMaterial(object.material);
-        } else {
-          // an array of materials
-          for (const material of object.material) cleanMaterial(material);
-        }
-      });
-      scene = null;
+            if (object.material.isMaterial) {
+                cleanMaterial(object.material);
+            } else {
+                // an array of materials
+                for (const material of object.material) cleanMaterial(material);
+            }
+        });
+        scene = null;
     }
 
     if(camera){
-      camera = null;
+        camera = null;
     }
 
     if(controls){
-      controls.dispose();
-      controls = null;
+        controls.dispose();
+        controls = null;
     }
 
     if(mixer){
-      mixer = null;
+        mixer = null;
     }
 
     if(handModel){
-      handModel = null;
+        handModel = null;
     }
 
     if(animationAction) {
-      animationAction = null;
+        animationAction = null;
     }
 
     //Remove from DOM
@@ -210,26 +232,22 @@ function cleanup() {
 }
 
 function cleanMaterial(material) {
-  material.dispose();
+    material.dispose();
 
-  // dispose textures
-  for (const key of Object.keys(material)) {
-    const value = material[key]
-    if (value && typeof value === 'object' && 'minFilter' in value) {
-      value.dispose()
+    // dispose textures
+    for (const key of Object.keys(material)) {
+        const value = material[key]
+        if (value && typeof value === 'object' && 'minFilter' in value) {
+            value.dispose()
+        }
     }
-  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const btnShowHandModel = document.getElementById('btnShowHandModel');
-    btnShowHandModel.addEventListener('click', () => {
-        if (!scene) {
-            init();
-        }
-    });
+    // Directly call init() when the DOM is ready, no button click needed
+    init();
 
-    const views = ['btnShowLogin', 'btnShowPatient', 'btnShowSession', 'btnShowCamera'];
+    const views = ['btnLogin', 'btnPatient', 'btnBluetooth'];
     views.forEach(viewId => {
         document.getElementById(viewId).addEventListener('click', cleanup);
     });

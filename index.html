@@ -1,137 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Madglove Sense</title>
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-    crossorigin="anonymous"
-  />
-  <link rel="stylesheet" href="app/css/style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Madglove Sense</title>
 
+    <!-- Bootstrap for styling -->
+    <link 
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
+        rel="stylesheet" 
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
+        crossorigin="anonymous"
+    />
 
 </head>
-<body class="container mt-4">
-  <!-- Logo + Title -->
-  <div class="text-center mb-3">
-    <img
-      src="app/images/logo.png"
-      alt="Madglove Sense Logo"
-      style="max-width: 150px;"
-      class="d-block mx-auto mb-2"
-    />
-    <h1>Madglove Sense <small class="text-muted">v0.2</small></h1>
-  </div>
 
-  <!-- Navigation + Status Bar -->
-  <div class="mb-4">
-    <!-- Global Status Bar -->
-    <div id="globalStatusBar" class="alert alert-secondary d-flex justify-content-between align-items-center">
-      <span id="backendStatus">Not logged in</span>
-      <span id="bluetoothStatus">Bluetooth disconnected</span>
-    </div>
+<body>
 
-    <!-- Navigation Pills -->
-    <nav class="nav nav-pills justify-content-center bg-light border p-3 mb-3">
-      <button class="nav-link active" id="btnShowLogin">Login</button>
-      <button class="nav-link" id="btnShowPatient">Patient</button>
-      <button class="nav-link" id="btnShowSession">Session</button>
-      <button class="nav-link" id="btnShowCamera">Camera</button>
-      <button class="nav-link" id="btnShowHandModel">Hand Model</button> 
-    </nav>
-  </div>
+    <!-- Main App Container -->
+    <div id="app-container" class="container-fluid">
+        
+        <!-- Header -->
+        <header class="row">
+            <div class="col-12 d-flex align-items-center my-3">
+                <img src="app/images/logo.png" alt="Madglove Sense Logo" style="max-width: 150px;" class="mx-3">
+                <h1 class="m-0">Madglove Sense <small class="text-muted">v0.2</small></h1>
+            </div>
+        </header>    
 
-  <!-- VIEW: LOGIN -->
-  <div id="loginView" style="display: block;">
-    <div id="authContainer" class="mt-3">
-      <!-- Auth form is dynamically injected by auth.js -->
-    </div>
-  </div>
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-tabs" id="appTabs">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#dashboardView">Dashboard</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#deviceView">Bluetooth</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#patientView">Patient</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#accountView">Account</button>
+            </li>
+        </ul>
 
-  <!-- VIEW: PATIENT -->
-  <div id="patientView" style="display: none;">
-    <!-- The new patient.js code will inject the UI here -->
-  </div>
+        <!-- Tab Content -->
+        <div class="tab-content mt-3">
 
-  <!-- VIEW: SESSION -->
-  <div id="sessionView" style="display: none;">
-    <h2>BLE Sensor Data</h2>
-    <p id="status" class="alert alert-info">Disconnected</p>
-    <button id="connect" class="btn btn-primary">Connect to BLE Device</button>
-    <button id="start" class="btn btn-success" disabled>Start Streaming</button>
-    <button id="stop" class="btn btn-danger" disabled>Stop Streaming</button>
+            <!-- DASHBOARD -->
+            <div class="tab-pane fade show active" id="dashboardView">
+                <h2>Dashboard</h2>
 
-    <br />
-    <div class="mt-3">
-      <button id="startRecording" class="btn btn-warning">Start Recording</button>
-      <button id="stopRecording" class="btn btn-secondary" disabled>Stop Recording</button>
-      <button id="downloadCSV" class="btn btn-info" disabled>Download CSV</button>
-    </div>
+                <!-- Status Overview (Dynamic Content from ui.js) -->
+                <div id="statusOverview"></div>
 
-    <h3 class="mt-4">Real-Time Sensor Data</h3>
-    <div id="data" class="border p-3 bg-light">
-      No data received yet.
-    </div>
+                <!-- Main Content -->
+                <main class="row mt-1 g-3" id="videoAndCanvasRow">
+                    <section class="col-12 col-md-6 border">
+                        <div id="cameraView" class="p-3">📷 Camera Feed Here</div>
+                    </section>
+                    <section class="col-12 col-md-6 border">
+                        <div id="handModelView" class="p-3">✋ Hand Model Visualization</div>
+                    </section>
+                </main>
 
-    <br />
+                <!-- Charts & Data -->
+                <section class="row mt-1 g-3">
+                    <div class="col-12 border">
+                        <div id="chartsAndDataRow" class="p-3">📊 Data & Charts Here</div>
+                    </div>
+                </section>
+            </div>
 
-    <h2 class="text-center mb-4">Madglove Sense - IMU Data Visualization</h2>
-    <!-- Placeholder for dynamically generated charts -->
-    <div id="chartsContainer" class="row"></div>
+            <!-- BLUETOOTH -->
+            <div class="tab-pane fade" id="deviceView">
+                <h2>Bluetooth</h2>
+                <div id="bluetoothStatus"></div>
+                <div id="bluetoothControls"></div>
+                <pre id="debug"></pre>
+                <div id="data"></div>
+            </div>
 
-    <br />
-    <div>
-      <h3 class="mt-4">Raw BLE Data</h3>
-      <pre id="debug" class="border p-3 bg-light">Debug log will appear here.</pre>
-    </div>
-  </div>
+            <!-- PATIENT -->
+            <div class="tab-pane fade" id="patientView">
+                <h2>Patient Data</h2>
+                <p>Select or manage patient data.</p>
+            </div>
 
-  <!-- VIEW: CAMERA -->
-  <div id="cameraView" style="display: none;"></div>
+            <!-- ACCOUNT -->
+            <div class="tab-pane fade" id="accountView">
+                <h2>Account</h2>
+                <p>Login/Logout & User Information</p>
+            </div>
 
-  <!-- VIEW: Hand Model -->
-  <div id="handModelView">
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://unpkg.com/three@0.162.0/build/three.module.js",
-          "three/addons/": "https://unpkg.com/three@0.162.0/examples/jsm/"
-        }
-      }
+        </div> <!-- End tab-content -->
+
+    </div> <!-- End app-container -->
+
+    <!-- 🔥 Load only one JavaScript file -->
+    <script type="module" src="app/js/app.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script 
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous">
     </script>
-  </div>
-  <script type="module" src="app/js/handModel.js"></script>
-  
-
-  <!-- Scripts -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"
-  ></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-
-  <!-- Load status bar first -->
-  <script src="app/js/statusBar.js"></script>
-  <!-- BLE Logic -->
-  <script src="app/js/bleManager.js"></script>
-  <!-- Charts -->
-  <script src="app/js/charts.js"></script>
-  <!-- Recording -->
-  <script src="app/js/recording.js"></script>
-  <!-- Authentication to backend -->
-  <script src="app/js/backendAuth.js"></script>
-  <!-- View switching -->
-  <script src="app/js/viewController.js"></script>
-  <!-- Patient view -->
-  <script src="app/js/patient.js"></script>
-  <!-- Camera Manager -->
-  <script src="app/js/cameraManager.js"></script>
-  
-
 
 </body>
 </html>
