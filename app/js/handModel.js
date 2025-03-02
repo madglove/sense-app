@@ -2,253 +2,98 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-let scene, camera, renderer, controls, handModel, mixer, animationClip, animationAction; // Added animationAction
+// Get the container div
+const container = document.getElementById('handModelView');
 
-// using this model https://sketchfab.com/3d-models/low-poly_hand_with_animation.glb
+// Dynamically update the div's height
+container.style.height = '500px';
+container.style.width = '100%';
 
-function init() {
-    // 1. Scene Setup
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xdddddd);
+// Scene setup
+const scene = new THREE.Scene();
 
-    // 2. Camera Setup
-    camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000); // Aspect ratio will be set later
+// Adjust near/far planes to prevent clipping
+const camera = new THREE.PerspectiveCamera(
+    50, // Field of View (FoV)
+    container.clientWidth / container.clientHeight, 
+    0.01, // Near plane to avoid clipping
+    500   // Far plane to keep objects visible
+);
+camera.position.set(0, 2, 3); // Temporary starting position
 
-    // 3. Renderer Setup
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    const handModelContainer = document.getElementById('handModelView');
+// Renderer
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(container.clientWidth, container.clientHeight);
+container.innerHTML = ''; 
+container.appendChild(renderer.domElement);
 
-    // Get the width and height of the container
-    const width = handModelContainer.offsetWidth;
-    const height = handModelContainer.offsetHeight;
+// 🔥 FIX: ADD TWO LIGHTS FOR BETTER VISIBILITY
+const light1 = new THREE.DirectionalLight(0xffffff, 1);
+light1.position.set(5, -5, 5); // Light from front-right
+scene.add(light1);
 
-    console.log("handModelView div dimensions:", width, height); // *** DEBUG LOG 1: Container Dimensions ***
+const light2 = new THREE.DirectionalLight(0xffffff, 0.2);
+light2.position.set(-5, 5, -5); // Light from back-left (opposite direction)
+scene.add(light2);
 
-    renderer.setSize(width, height);
-    camera.aspect = width / height;
+// Load GLB model
+const loader = new GLTFLoader();
+loader.load('/app/models/low-poly_hand_with_animation.glb', function (gltf) {
+    const model = gltf.scene;
+    scene.add(model);
+
+    // Compute bounding box to auto-adjust camera
+    const box = new THREE.Box3().setFromObject(model);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+
+    // Center the model
+    model.position.sub(center);
+
+    // Auto-scale model if it's too large
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const idealCameraZ = maxDim * 1.5;
+
+    // Move camera slightly left (-X) for better angle
+    camera.position.set(-idealCameraZ / 3, maxDim / 2, idealCameraZ);
+
+    // Prevent objects from disappearing
+    camera.far = idealCameraZ * 3;
     camera.updateProjectionMatrix();
 
-    handModelContainer.appendChild(renderer.domElement);
-
-    // 4. Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(1, 1, 1);
-    scene.add(directionalLight);
-
-    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
-    directionalLight2.position.set(-1, -1, -1);
-    scene.add(directionalLight2);
-
-    // 5. 3D Model Loading
-    const loader = new GLTFLoader();
-    loader.load('app/models/low-poly_hand_with_animation.glb', (gltf) => {
-        handModel = gltf.scene;
-        scene.add(handModel);
-
-        console.log("Model loaded successfully:", handModel); // *** DEBUG LOG 2: Model Load Success ***
-
-        // --- Animation Setup (Corrected) ---
-        if (gltf.animations && gltf.animations.length) {
-            mixer = new THREE.AnimationMixer(handModel);
-            animationClip = gltf.animations[0];
-            animationAction = mixer.clipAction(animationClip); // Create and store the action
-            animationAction.play(); // Initially play the animation (important!)
-            animationAction.paused = true; // Immediately pause it
-
-            // Create a slider to control the animation
-            createAnimationControlSlider();
-        }
-        // --- End Animation Setup ---
-
-        // --- Calculate Bounding Box and Adjust Camera ---
-        const boundingBox = new THREE.Box3().setFromObject(handModel);
-        const size = boundingBox.getSize(new THREE.Vector3());
-        const center = boundingBox.getCenter(new THREE.Vector3());
-
-        // Adjust camera position
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const fov = camera.fov * (Math.PI / 180);
-        let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-        cameraZ *= 2.5;
-
-        camera.position.set(center.x, center.y, center.z + cameraZ);
-        camera.lookAt(center);
-        controls.target.copy(center);
-
-        // --- Scale Down the Model (to 0.2) ---
-        handModel.scale.set(0.2, 0.2, 0.2); // Scale down to 20%
-        // --- End Model Scaling ---
-
-        handModel.rotation.x = 0;
-        handModel.rotation.y = Math.PI;
-        handModel.rotation.z = 0;
-        handModel.position.set(0, 0, 0);
-
-        handModel.traverse((child) => {
-            if (child.isMesh) {
-                child.material = new THREE.MeshStandardMaterial({
-                    color: 0x808080,
-                    roughness: 0.7,
-                    metalness: 0.2,
-                });
-            }
-        });
-
-        console.log("Camera Position:", camera.position); // *** DEBUG LOG 3: Camera Position ***
-        console.log("Camera LookAt Target:", controls.target); // *** DEBUG LOG 4: Camera Target ***
-        console.log("Hand Model Position:", handModel.position); // *** DEBUG LOG 5: Model Position ***
-        console.log("Hand Model Scale:", handModel.scale); // *** DEBUG LOG 6: Model Scale ***
-        console.log("Hand Model Rotation:", handModel.rotation); // *** DEBUG LOG 7: Model Rotation ***
-        console.log("Bounding Box Size:", size); // *** DEBUG LOG 8: Bounding Box Size ***
-        console.log("Bounding Box Center:", center); // *** DEBUG LOG 9: Bounding Box Center ***
-
-
-    },
-    undefined,
-    (error) => {
-        console.error('An error happened while loading the model:', error); // Error log remains
-    });
-
-    // 6. Orbit Controls
-    controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.1;
-    controls.screenSpacePanning = false;
-    controls.minDistance = 0.1;
-    controls.maxDistance = 100;
-
-    // 7. Handle Window Resize
-    window.addEventListener('resize', onWindowResize);
-    animate();
-}
-
-function animate() {
-    requestAnimationFrame(animate);
+    // Set OrbitControls target to model center
+    controls.target.set(center.x, center.y, center.z);
     controls.update();
-    if (mixer) {
-        mixer.update(0); // Keep delta time at 0 for manual control
+
+    // Handle animation if present
+    const mixer = new THREE.AnimationMixer(model);
+    if (gltf.animations.length > 0) {
+        const action = mixer.clipAction(gltf.animations[0]);
+        action.play();
     }
-    renderer.render(scene, camera);
-}
 
-function onWindowResize() {
-    const handModelContainer = document.getElementById('handModelView');
-    const newWidth = handModelContainer.offsetWidth;
-    const newHeight = handModelContainer.offsetHeight;
+    // Animation loop
+    function animate() {
+        requestAnimationFrame(animate);
+        mixer.update(0.01);
+        renderer.render(scene, camera);
+    }
+    animate();
+}, undefined, function (error) {
+    console.error('Error loading model:', error);
+});
 
-    camera.aspect = newWidth / newHeight;
+// Orbit Controls for better interaction
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.1;
+controls.rotateSpeed = 0.5;
+controls.zoomSpeed = 1;
+
+// Resize handling
+window.addEventListener('resize', () => {
+    container.style.height = '500px';
+    camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(newWidth, newHeight);
-}
-
-// --- Corrected Animation Control Slider Function ---
-function createAnimationControlSlider() {
-    const handModelContainer = document.getElementById('handModelView');
-
-    const slider = document.createElement('input');
-    slider.type = 'range';
-    slider.min = 0;
-    slider.max = animationClip.duration;
-    slider.step = 0.01;
-    slider.value = 0;
-    slider.style.width = '80%';
-    slider.style.marginTop = '10px';
-
-    const sliderContainer = document.createElement('div');
-    sliderContainer.style.display = 'flex';
-    sliderContainer.style.justifyContent = 'center';
-    sliderContainer.style.alignItems = 'center';
-
-
-    slider.addEventListener('input', () => {
-        if (mixer && animationAction) { // Check for both mixer and action
-            const time = parseFloat(slider.value);
-            animationAction.paused = false; // Unpause before setting time
-            animationAction.time = time;    // Directly set the time on the action
-            animationAction.paused = true; // Pause again immediately
-        }
-    });
-
-
-    sliderContainer.appendChild(slider);
-    handModelContainer.appendChild(sliderContainer);
-}
-// --- End Corrected Function ---
-
-
-// Cleanup (same as before)
-function cleanup() {
-    if (renderer) {
-        renderer.dispose();
-        renderer.forceContextLoss();
-        renderer = null;
-    }
-    if (scene) {
-        scene.traverse(object => {
-            if (!object.isMesh) return;
-
-            object.geometry.dispose();
-
-            if (object.material.isMaterial) {
-                cleanMaterial(object.material);
-            } else {
-                // an array of materials
-                for (const material of object.material) cleanMaterial(material);
-            }
-        });
-        scene = null;
-    }
-
-    if(camera){
-        camera = null;
-    }
-
-    if(controls){
-        controls.dispose();
-        controls = null;
-    }
-
-    if(mixer){
-        mixer = null;
-    }
-
-    if(handModel){
-        handModel = null;
-    }
-
-    if(animationAction) {
-        animationAction = null;
-    }
-
-    //Remove from DOM
-    const handModelContainer = document.getElementById('handModelView');
-    while (handModelContainer.firstChild) {
-        handModelContainer.removeChild(handModelContainer.firstChild);
-    }
-
-}
-
-function cleanMaterial(material) {
-    material.dispose();
-
-    // dispose textures
-    for (const key of Object.keys(material)) {
-        const value = material[key]
-        if (value && typeof value === 'object' && 'minFilter' in value) {
-            value.dispose()
-        }
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Directly call init() when the DOM is ready, no button click needed
-    init();
-
-    const views = ['btnLogin', 'btnPatient', 'btnBluetooth'];
-    views.forEach(viewId => {
-        document.getElementById(viewId).addEventListener('click', cleanup);
-    });
+    renderer.setSize(container.clientWidth, container.clientHeight);
 });
