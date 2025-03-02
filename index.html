@@ -24,7 +24,7 @@
         <header class="row">
             <div class="col-12 d-flex align-items-center my-3">
                 <img src="app/images/logo.png" alt="Madglove Sense Logo" style="max-width: 150px;" class="mx-3">
-                <h1 class="m-0">Madglove Sense <small class="text-muted">v0.2</small></h1>
+                <h1 class="m-0">Madglove Sense <small class="text-muted">v0.21</small></h1>
             </div>
         </header>    
 
@@ -50,10 +50,7 @@
             <!-- DASHBOARD -->
             <div class="tab-pane fade show active" id="dashboardView">
                 <h2>Dashboard</h2>
-
-                <!-- Status Overview (Dynamic Content from ui.js) -->
-                <div id="statusOverview"></div>
-
+                
                 <!-- Main Content -->
                 <main class="row mt-1 g-3" id="videoAndCanvasRow">
                     <section class="col-12 col-md-6 border">
@@ -75,10 +72,6 @@
             <!-- BLUETOOTH -->
             <div class="tab-pane fade" id="deviceView">
                 <h2>Bluetooth</h2>
-                <div id="bluetoothStatus"></div>
-                <div id="bluetoothControls"></div>
-                <pre id="debug"></pre>
-                <div id="data"></div>
             </div>
 
             <!-- PATIENT -->
@@ -97,8 +90,8 @@
 
     </div> <!-- End app-container -->
 
-    <!-- 🔥 Load only one JavaScript file -->
-    <script type="module" src="app/js/app.js"></script>
+    <!-- 🔥 Load JavaScript files -->
+    <script src="app/js/ble.js"></script>
 
     <!-- Bootstrap JS -->
     <script 
