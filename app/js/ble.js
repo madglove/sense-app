@@ -44,6 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Global variable to store the latest IMU data.
   window.latestIMUData = null;
 
+  // Global flag for BLE connection status.
+  window.bleConnected = false;
+
   // Toggle connect/disconnect functionality.
   connectBtn.addEventListener('click', async () => {
     // If already connected, disconnect.
@@ -52,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
       updateConnectButton(false);
       updateStreamButton(false);
       statusElem.textContent = 'Disconnected.';
+      window.bleConnected = false;
       return;
     }
 
@@ -73,6 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
       characteristic = await service.getCharacteristic('beb5483e-36e1-4688-b7f5-ea07361b26a8');
 
       statusElem.textContent = 'Connected! Ready to receive data';
+      // Set global BLE flag
+      window.bleConnected = true;
 
       // Update the global Bluetooth status if available.
       if (window.updateBluetoothStatus) {
@@ -236,6 +242,8 @@ document.addEventListener('DOMContentLoaded', () => {
     resetConnection();
     updateConnectButton(false);
     updateStreamButton(false);
+    // Reset the BLE connection flag.
+    window.bleConnected = false;
     if (window.updateBluetoothStatus) {
       window.updateBluetoothStatus('BLE Disconnected');
     }
