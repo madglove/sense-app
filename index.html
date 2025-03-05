@@ -81,6 +81,27 @@
             <!-- DASHBOARD -->
             <div class="tab-pane fade show active" id="dashboardView">
                 <h2>Dashboard</h2>
+                <section class="row mt-1 g-3">
+                    <section class="col-12 col-md-6 border">
+                        <div class="list-group list-group-flush">
+                            <!-- Extrahorizon Authentication -->
+                            <a class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-2">
+                              <span>Extrahorizon Account: <strong id="auth-status">Logged Out</strong></span>
+                              <span class="badge bg-primary" id="auth-action">Login</span>
+                            </a>
+                            <!-- Patient Data -->
+                            <a class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-2">
+                              <span>Patient: <strong id="patient-status">None</strong></span>
+                              <span class="badge bg-info" id="patient-action">Select</span>
+                            </a>
+                          </div>
+                    </section>
+                    <section class="col-12 col-md-6 border">
+                        <div id="bleStatusView" class="p-3"></div>
+                        <div id="bleDataRecording" class="p-3" hidden></div>
+                    </section>
+        
+                </section>
                 
                 <!-- Main Content -->
                 <main class="row mt-1 g-3" id="videoAndCanvasRow">
@@ -129,6 +150,8 @@
     <script src="app/js/webcam.js"></script>
     <script type="module" src="app/js/handModel.js"></script>
     <script type="module" src="app/js/handTracking.js"></script>
+    <script src="app/js/bleStatus.js"></script>
+    <script src="app/js/bleRecording.js"></script>
 
 
     <!-- Bootstrap JS -->
