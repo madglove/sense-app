@@ -30,12 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `<p>Bluetooth is disconnected.</p>`;
         }
         
-        // Button to switch to the Bluetooth tab
-        html += `
-                    <button id="goToBluetooth" class="btn btn-primary mt-3">Go to Bluetooth Tab</button>
-                </div>
-            </div>
-        `;
         container.innerHTML = html;
     }
 
