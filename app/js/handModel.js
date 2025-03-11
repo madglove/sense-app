@@ -55,7 +55,7 @@ const light1 = new THREE.DirectionalLight(0xffffff, 1);
 light1.position.set(5, -5, 5);
 scene.add(light1);
 
-const light2 = new THREE.DirectionalLight(0xffffff, 0.2);
+const light2 = new THREE.DirectionalLight(0xffffff, 1);
 light2.position.set(-5, 5, -5);
 scene.add(light2);
 
