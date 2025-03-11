@@ -74,7 +74,7 @@ let running = false;
 
 // Load GLB model
 const loader = new GLTFLoader();
-loader.load('/app/models/low-poly_hand_with_animation.glb', function (gltf) {
+loader.load('app/models/low-poly_hand_with_animation.glb', function (gltf) {
     const model = gltf.scene;
     scene.add(model);
 
